@@ -1,0 +1,18 @@
+/*.js.br
+  Content-Type: application/javascript
+  Content-Encoding: br
+/*.js.gz
+  Content-Type: application/javascript
+  Content-Encoding: gzip
+/*.wasm.br
+  Content-Type: application/wasm
+  Content-Encoding: br
+/*.wasm.gz
+  Content-Type: application/wasm
+  Content-Encoding: gzip
+/*.data.br
+  Content-Type: application/octet-stream
+  Content-Encoding: br
+/*.data.gz
+  Content-Type: application/octet-stream
+  Content-Encoding: gzip
