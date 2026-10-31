@@ -1,0 +1,22 @@
+﻿<!doctype html><meta charset="utf-8"><title>Make hostable</title>
+<body style="font:15px/1.5 system-ui,sans-serif;background:#111;color:#eee;padding:24px;max-width:660px">
+<h2>Make this folder hostable</h2>
+<p>This game uses compressed files (.br / .gz) that hosts like GitHub Pages cannot serve. Keep the Start .bat server running, open this page from it (<code>http://localhost:PORT/make-hostable.html</code>), click the button and pick <b>this same folder</b>. The files get unpacked and index.html is updated. Needs Chrome, Edge or Opera.</p>
+<button id="go" style="padding:12px 20px;font-size:16px">Pick folder and unpack</button><pre id="log"></pre>
+<script>
+var L=function(t){document.getElementById('log').textContent+=t+'\n'};
+async function walk(d,p,o){for await(var e of d.entries()){var n=e[0],h=e[1];if(h.kind==='directory'){if(n!=='_ext')await walk(h,p+n+'/',o)}else if(/\.(br|gz)$/.test(n))o.push([d,n,p+n])}}
+document.getElementById('go').onclick=async function(){
+try{
+if(location.protocol!=='http:'){L('Open this page through the Start .bat server (http://localhost:...), not from the file.');return}
+var root=await showDirectoryPicker({mode:'readwrite'}),list=[],map={};
+await walk(root,'',list);
+if(!list.length){L('No .br or .gz files found in that folder.');return}
+for(var i=0;i<list.length;i++){var d=list[i][0],n=list[i][1],p=list[i][2];
+var r=await fetch(encodeURI(p));if(!r.ok){L('Skipped '+p+' ('+r.status+')');continue}
+var out=n.replace(/\.(br|gz)$/,''),fh=await d.getFileHandle(out,{create:true}),w=await fh.createWritable();
+await w.write(await r.arrayBuffer());await w.close();await d.removeEntry(n);map[n]=out;L('Unpacked '+p)}
+var ih=await root.getFileHandle('index.html'),t=await (await ih.getFile()).text();
+for(var k in map)t=t.split(k).join(map[k]);
+var iw=await ih.createWritable();await iw.write(t);await iw.close();
+L('Done. Upload this folder to your host.')}catch(e){L('Error: '+e)}};</script>
